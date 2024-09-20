@@ -7,12 +7,8 @@ nav: true
 nav_order: 2
 ---
 
-<!-- _pages/publications.md -->
-
-<!-- Bibsearch Feature -->
-
 <div class="publications">
 
-{% bibliography %}
+{% bibliography --group_by type%}
 
 </div>
