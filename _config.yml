@@ -337,7 +337,7 @@ scholar:
   order: descending
   #type_aliases: { inproceedings: incollection}
   type_order: [article, misc]
-  type_names: {misc: preprints, article: journal article}
+  type_names: {misc: preprints, article: journal articles}
   
   bibtex_filters: [latex, smallcaps, superscript]
 
