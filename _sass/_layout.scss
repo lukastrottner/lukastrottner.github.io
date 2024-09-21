@@ -46,7 +46,7 @@ body.sticky-bottom-footer {
 .publications {
   margin-top: 2rem;
   h1 {
-    color: $light-cyan-color;
+    color: var(--global-theme-color);
     font-size: 2rem;
     text-align: center;
     margin-top: 1em;
@@ -103,6 +103,11 @@ body.sticky-bottom-footer {
       }
       .title {
         font-weight: bolder;
+      }
+      .author {
+        em {
+          font-style: normal;
+        }
       }
       .links {
         a.btn {
