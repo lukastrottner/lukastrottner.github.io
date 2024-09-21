@@ -21,7 +21,7 @@
       institution: University of Mannheim, Germany
       year: 2016
 
-  - title: Research Interests
+- title: Research Interests
   type: nested_list
   contents:
     - title: statistics for stochastic processes
