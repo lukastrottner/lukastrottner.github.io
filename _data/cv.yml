@@ -3,23 +3,23 @@
   contents:
     - title: Assistant Professor in Statistics
       institution: School of Mathematics, University of Birmingham, UK
-      year: since Sep 2024
+      year:  2024 -
     - title: Postdoc
       institution: Department of Mathematics, Aarhus University, Denmark
-      year: Sep 2021 -- Sep 2024
+      year: 
 
 - title: Education
   type: time_table
   contents:
     - title: Dr. rer. nat.
       institution: University of Mannheim, Germany
-      year: Sep 2021
+      year: 2021
     - title: MSc Mathematics in Business and Economics
       institution: University of Mannheim, Germany
-      year: Aug 2018
+      year: 2018
     - title: BSc Mathematics in Business and Economics
       institution: University of Mannheim, Germany
-      year: Dec 2016
+      year: 2016
 
   - title: Research Interests
   type: nested_list
@@ -34,9 +34,9 @@
   type: time_table
   contents:
     - title: [DYNSTOCH Satellite Summer School on Generative Models and MCMC](https://user.math.uni-kiel.de/~j-kallsen/Dynstoch2024/satellite.html), Kiel, Germany
-      year: May 2024
+      year: 2024
     - title: Contributed Session <i>High-dimensional statistics for stochastic processes</i> at [SPA 2023](https://www.spa2023.org), Lisbon, Portugal
-      year:  July 2023
+      year: 2023
     - title: [The Midsummer Lectures 2023](https://math.au.dk/en/currently/activities/event/activity/6512?cHash=d721d8afd336084a957c153ed8d3d112), Aarhus, Denmark
-      year: June 2023
+      year: 2023
     - title: [Aarhus--Copenhagen Data Science Meeting 2022](https://aukuds.com), Aarhus, Denmark
