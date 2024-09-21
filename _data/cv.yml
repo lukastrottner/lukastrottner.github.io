@@ -1,97 +1,42 @@
-- title: General Information
-  type: map
+- title: Employment
+  type: time_table
   contents:
-    - name: Full Name
-      value: Albert Einstein
-    - name: Date of Birth
-      value: 14th March 1879
-    - name: Languages
-      value: English, German
+    - title: Assistant Professor in Statistics
+      institution: School of Mathematics, University of Birmingham, UK
+      year: Sep 2024 --
+    - title: Postdoc
+      institution: Department of Mathematics, Aarhus University, Denmark
+      year: Sep 2021 -- Sep 2024
 
 - title: Education
   type: time_table
   contents:
-    - title: PhD
-      institution: University of Zurich, Zurich, Switzerland
-      year: 1905
-      description:
-        - Description 1.
-        - Description 2.
-        - title: Description 3.
-          contents:
-            - Sub-description 1.
-            - Sub-description 2.
-    - title: Federal teaching diploma
-      institution: Eidgenössische Technische Hochschule, Zurich, Switzerland
-      year: 1900
-      description:
-        - Description 1.
-        - Description 2.
+    - title: Dr. rer. nat.
+      institution: University of Mannheim, Germany, Advisor: [Prof. Leif Döring](https://www.wim.uni-mannheim.de/doering/)
+      year: Sep 2021
+    - title: MSc Mathematics in Business and Economics
+      institution: University of Mannheim, Germany
+      year: Aug 2018
+    - title: BSc Mathematics in Business and Economics
+      institution: University of Mannheim, Germany
+      year: Dec 2016
 
-- title: Experience
-  type: time_table
-  contents:
-    - title: Professor of Theoretical Physics
-      institution: Institute for Advanced Study, Princeton University
-      year: 1933 - 1955
-      description:
-        - Description 1.
-        - Description 2.
-        - title: Description 3.
-          contents:
-            - Sub-description 1.
-            - Sub-description 2.
-    - title: Visiting Professor
-      institution: California Institute of Technology, Pasadena, California, US
-      year: 1933
-      description:
-        - Description 1.
-        - Description 2.
-
-    - title: Director
-      institution: Kaiser Wilhelm Institute for Physics, Berlin, Germany.
-      year: 1917-1933
-
-    - title: Professor of Theoretical Physics
-      institution: Karl-Ferdinand University, Prague, Czechoslovakia
-      year: 1911 - 1917
-      description:
-
-    - title: Associate Professor of Theoretical Physics
-      institution: University of Zurich, Zurich, Switzerland
-      year: 1909 - 1911
-
-- title: Open Source Projects
-  type: time_table
-  contents:
-    - title: <a href="https://github.com/alshedivat/al-folio">al-folio</a>
-      year: 2015-now
-      description: A beautiful, simple, clean, and responsive Jekyll theme for academics.
-
-- title: Honors and Awards
-  type: time_table
-  contents:
-    - year: 1921
-      items:
-        - Nobel Prize in Physics
-        - Matteucci Medal
-    - year: 2029
-      items:
-        - Max Planck Medal
-
-- title: Academic Interests
+  - title: Research Interests
   type: nested_list
   contents:
-    - title: Topic 1.
-      items:
-        - Description 1.
-        - Description 2.
-    - title: Topic 2.
-      items:
-        - Description 1.
-        - Description 2.
+    - title: statistics for stochastic processes
+    - title: statistical aspects of generative modelling
+    - title: transfer learning
+    - title: data-driven stochastic optimal control 
+    - title: Lévy and Markov additive processes
 
-- title: Other Interests
-  type: list
+- title: Organisation of scientific events
+  type: time_table
   contents:
-    - <u>Hobbies:</u> Hobby 1, Hobby 2, etc.
+    - title: [DYNSTOCH Satellite Summer School on Generative Models and MCMC](https://user.math.uni-kiel.de/~j-kallsen/Dynstoch2024/satellite.html), Kiel, Germany
+      year: May 2024
+    - title: Contributed Session <i>High-dimensional statistics for stochastic processes</i> at [SPA 2023](https://www.spa2023.org), Lisbon, Portugal
+      year:  July 2023
+    - title: [The Midsummer Lectures 2023](https://math.au.dk/en/currently/activities/event/activity/6512?cHash=d721d8afd336084a957c153ed8d3d112), Aarhus, Denmark
+      year: June 2023
+    - title: [Aarhus--Copenhagen Data Science Meeting 2022](https://aukuds.com), Aarhus, Denmark
