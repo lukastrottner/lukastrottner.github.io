@@ -9,6 +9,6 @@ nav_order: 2
 
 <div class="publications">
 
-{% bibliography --group_by type%}
+{% bibliography -f papers --group_by type%}
 
 </div>
