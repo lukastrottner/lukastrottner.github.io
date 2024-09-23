@@ -9,6 +9,6 @@ nav_order: 2
 
 <div class="publications">
 
-{% talks %}
+{% bibliography -f talks %}
 
 </div>
