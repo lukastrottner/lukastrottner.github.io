@@ -340,7 +340,7 @@ scholar:
   #group_order: descending
 
   
-  bibliography: papers.bib
+  bibliography: talks.bib
   bibliography_template: bib
   # Note: if you have latex math in your bibtex, the latex filter
   # preprocessing may conflict with MathJAX if the latter is enabled.
