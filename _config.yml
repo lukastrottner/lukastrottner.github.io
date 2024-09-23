@@ -320,7 +320,6 @@ scholar:
   # Note: if you have latex math in your bibtex, the latex filter
   # preprocessing may conflict with MathJAX if the latter is enabled.
   # See https://github.com/alshedivat/al-folio/issues/357.
-
   sort_by: date
   order: descending
   #type_aliases: { inproceedings: incollection}
@@ -339,7 +338,7 @@ scholar:
   #group_by: year
   #group_order: descending
 
-  
+scholar:  
   bibliography: talks.bib
   bibliography_template: bib
   # Note: if you have latex math in your bibtex, the latex filter
