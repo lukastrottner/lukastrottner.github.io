@@ -1,11 +1,15 @@
 ---
-layout: cv
-permalink: /cv/
+layout: page
 title: cv
-nav: true
-nav_order: 5
-cv_pdf:
+permalink: /cv/
 description:
-toc:
-  sidebar: left
+nav: true
 ---
+
+- [Download CV](/assets/pdf/cv.pdf)
+
+
+<br>
+
+<object data="{{ site.url }}{{ site.baseurl }}/assets/pdf/cv.pdf" width="100%" 
+height="600" type="application/pdf"></object>
