@@ -74,11 +74,11 @@ body.sticky-bottom-footer {
     margin-bottom: -2rem;
     text-align: right;
   }
+  /* prettier-ignore */
   ol.bibliography {
     list-style: none;
     padding: 0;
     margin-top: 0;
-
     li {
       margin-bottom: 1rem;
       .abbr {
@@ -90,7 +90,7 @@ body.sticky-bottom-footer {
           padding-left: 1rem;
           padding-right: 1rem;
           a {
-            color: white;
+            color: var(--global-bg-color);
             &:hover {
               text-decoration: none;
             }
