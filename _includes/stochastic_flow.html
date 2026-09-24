@@ -1,4 +1,4 @@
-<div class="stochastic-flow-container" style="position: relative; width: 100%; height: 280px; background: transparent; border: 1px solid var(--global-divider-color); border-radius: 6px; overflow: hidden; margin: 20px 0;">
+<div class="stochastic-flow-container" style="position: relative; width: 100%; height: 300px; background: transparent; border: 1px solid var(--global-divider-color); border-radius: 6px; overflow: hidden; margin: 20px 0;">
   <canvas id="flowCanvas" style="display: block; width: 100%; height: 100%;"></canvas>
 </div>
 
@@ -7,84 +7,93 @@
   const canvas = document.getElementById('flowCanvas');
   const ctx = canvas.getContext('2d');
   let animationFrameId;
-  let globalTime = 0;
 
-  const lineCount = 10; 
-  let streamlines = [];
+  // Multi-dimensional Process Configuration
+  const processCount = 4;        // Number of independent multivariate path lines
+  const maxHistory = 140;        // Path history memory capacity before deletion
+  const stepsPerFrame = 4;       // Sub-frame integration steps for crisp high-speed spikes
+  const sigma = 3.8;             // Diffusion scaling factor (volatility magnitude)
+  
+  let processes = [];
 
   function resize() {
     const rect = canvas.parentElement.getBoundingClientRect();
     canvas.width = rect.width * window.devicePixelRatio;
     canvas.height = rect.height * window.devicePixelRatio;
     ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-    initLines(rect.width, rect.height);
+    initProcesses(rect.width, rect.height);
   }
 
-  function initLines(w, h) {
-    streamlines = [];
-    for (let i = 0; i < lineCount; i++) {
-      streamlines.push({
-        baseY: (h / (lineCount + 1)) * (i + 1),
-        seed: Math.random() * 500
+  function initProcesses(w, h) {
+    processes = [];
+    for (let i = 0; i < processCount; i++) {
+      processes.push({
+        // Start randomly in the interior domain space
+        x: w * 0.25 + Math.random() * w * 0.5,
+        y: h * 0.25 + Math.random() * h * 0.5,
+        history: [] // Finite historical trajectory array
       });
     }
   }
 
-  // Pure deterministic pseudo-noise function to generate sharp, reproducible spikes
-  function spikeNoise(x) {
-    return Math.abs(Math.sin(x) * Math.cos(x * 2.5)) - 0.5;
+  // Box-Muller sample generator for true standard normal Gaussian increments
+  function getGaussianPair() {
+    const u1 = Math.random() || 0.0001;
+    const u2 = Math.random() || 0.0001;
+    const radius = Math.sqrt(-2.0 * Math.log(u1));
+    const angle = 2.0 * Math.PI * u2;
+    return { z0: radius * Math.cos(angle), z1: radius * Math.sin(angle) };
   }
 
-  function drawFlowField(w, h, time, themeColor) {
-    const resolution = 2; // Drastically lowered to 2px for razor-sharp, spiky details
-    const fastTime = time * 0.02; // Accelerated timeline for higher energy jitter
-
-    streamlines.forEach((line, index) => {
-      ctx.beginPath();
+  function updateAndDraw(w, h, themeColor) {
+    processes.forEach((p, idx) => {
       
-      const normalizedRank = index / lineCount;
-      const verticalFade = Math.sin(normalizedRank * Math.PI);
-      const alpha = 0.05 + verticalFade * 0.18; 
-
-      ctx.strokeStyle = themeColor.replace(')', `, ${alpha})`).replace('rgb', 'rgba');
-      ctx.lineWidth = 1.2;
-
-      let first = true;
-
-      for (let x = 0; x <= w; x += resolution) {
-        // Multi-frequency Fractal-like Synthesis (Combining macro waves with micro spikes)
-        const input1 = x * 0.003 + fastTime * 0.1 + line.seed;
-        const input2 = x * 0.015 - fastTime * 0.3 + line.seed * 1.5;
-        const input3 = x * 0.06 + fastTime * 0.8 + line.seed * 3.0; // High frequency micro-spike layer
-
-        // 1. Macro trend layout
-        const macro = Math.sin(input1) * (h * 0.2);
+      // Perform sub-sampling steps per frame to create high-velocity spiky rendering paths
+      for (let s = 0; s < stepsPerFrame; s++) {
+        const noise = getGaussianPair();
         
-        // 2. Intermediate chaotic jagged layer
-        const jagged = spikeNoise(input2) * (h * 0.09);
+        // Dynamic path tracking state
+        p.history.push({ x: p.x, y: p.y });
         
-        // 3. Pure spiky fractal noise (high-frequency roughness)
-        const microSpikes = (Math.sin(input3) * Math.cos(input3 * 1.7)) * 14;
-
-        // Composite amplitude structure
-        const totalDisplacement = macro + jagged + microSpikes;
-
-        // Boundaries padding fade structure
-        const edgePadding = 40;
-        let edgeFade = 1;
-        if (x < edgePadding) edgeFade = x / edgePadding;
-        if (x > w - edgePadding) edgeFade = (w - x) / edgePadding;
-        
-        const finalY = line.baseY + (totalDisplacement * edgeFade);
-
-        if (first) {
-          ctx.moveTo(x, finalY);
-          first = false;
-        } else {
-          ctx.lineTo(x, finalY);
+        // Strict boundary history clearing
+        if (p.history.length > maxHistory) {
+          p.history.shift();
         }
+
+        // Wiener Process increment updates: dX_t = sigma * dW_t
+        p.x += sigma * noise.z0;
+        p.y += sigma * noise.z1;
+
+        // --- Skorokhod Boundary Reflection Logic ---
+        // Instantly reflects coordinates back into the interior if a boundary barrier layout is pierced
+        if (p.x < 0)   { p.x = -p.x; }
+        if (p.x > w)   { p.x = 2 * w - p.x; }
+        if (p.y < 0)   { p.y = -p.y; }
+        if (p.y > h)   { p.y = 2 * h - p.y; }
       }
+
+      // Draw the complete active multivariate trajectory memory block
+      if (p.history.length < 2) return;
+
+      ctx.beginPath();
+      ctx.moveTo(p.history[0].x, p.history[0].y);
+      for (let i = 1; i < p.history.length; i++) {
+        ctx.lineTo(p.history[i].x, p.history[i].y);
+      }
+
+      // Individual path alpha weighting profile based on index mapping variations
+      const alphaBase = 0.12 + (idx * 0.04);
+      ctx.strokeStyle = themeColor.replace(')', `, ${alphaBase})`).replace('rgb', 'rgba');
+      ctx.lineWidth = 1.2;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'miter'; // Miter gives razor-sharp spiky joints instead of rounded edges
       ctx.stroke();
+
+      // Draw a solid tracking cursor node right at the current process location head index
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 2, 0, 2 * Math.PI);
+      ctx.fillStyle = themeColor.replace(')', `, ${alphaBase * 2.0})`).replace('rgb', 'rgba');
+      ctx.fill();
     });
   }
 
@@ -92,7 +101,6 @@
   window.addEventListener('resize', resize);
 
   function animate() {
-    globalTime++;
     const currentW = canvas.width / window.devicePixelRatio;
     const currentH = canvas.height / window.devicePixelRatio;
 
@@ -100,7 +108,7 @@
 
     const themeColor = getComputedStyle(document.documentElement).getPropertyValue('--global-theme-color').trim() || 'rgba(0, 123, 255, 1)';
 
-    drawFlowField(currentW, currentH, globalTime, themeColor);
+    updateAndDraw(currentW, currentH, themeColor);
 
     animationFrameId = requestAnimationFrame(animate);
   }
