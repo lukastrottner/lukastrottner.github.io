@@ -1,8 +1,5 @@
-<div class="stochastic-flow-container" style="position: relative; width: 100%; height: 300px; background: transparent; border: 1px solid var(--global-divider-color); border-radius: 6px; overflow: hidden; margin: 20px 0;">
+<div class="stochastic-flow-container" style="position: relative; width: 100%; height: 350px; background: transparent; border: 1px solid var(--global-divider-color); border-radius: 6px; overflow: hidden; margin: 20px 0;">
   <canvas id="flowCanvas" style="display: block; width: 100%; height: 100%;"></canvas>
-  <div style="position: absolute; bottom: 8px; right: 12px; font-size: 0.75rem; font-family: monospace; color: var(--global-text-color); opacity: 0.6; pointer-events: none;">
-    dX_t = b(X_t)dt + &sigma;dW_t
-  </div>
 </div>
 
 <script>
@@ -11,11 +8,12 @@
   const ctx = canvas.getContext('2d');
   let animationFrameId;
 
-  // Configuration
-  const particleCount = 65;
+  // Heightened configuration for a highly dynamic field
+  const particleCount = 180; 
   const particles = [];
-  const dt = 0.15;
-  const sigma = 1.2; // Magnitude of Brownian motion noise
+  const dt = 0.2;
+  const sigma = 1.8; // Increased Brownian motion noise for more jitter/chaos
+  let globalTime = 0;
 
   function resize() {
     const rect = canvas.parentElement.getBoundingClientRect();
@@ -27,54 +25,65 @@
   class Particle {
     constructor(w, h) {
       this.reset(w, h);
-      // Stagger initial lifetimes
-      this.age = Math.random() * 200;
+      this.age = Math.random() * 150;
     }
 
     reset(w, h) {
       this.x = Math.random() * w;
       this.y = Math.random() * h;
       this.history = [];
-      this.maxHistory = 15;
+      this.maxHistory = 20 + Math.floor(Math.random() * 15); // Longer, varied tails
       this.age = 0;
-      this.maxAge = 150 + Math.random() * 100;
+      this.maxAge = 120 + Math.random() * 120;
+      this.velocityMagnitude = 0;
     }
 
-    update(w, h) {
+    update(w, h, time) {
       this.age++;
       if (this.age > this.maxAge) {
         this.reset(w, h);
         return;
       }
 
-      // Store history for the trajectory tail
       this.history.push({ x: this.x, y: this.y });
       if (this.history.length > this.maxHistory) {
         this.history.shift();
       }
 
-      // 1. Deterministic Drift b(X_t): Converging vortex towards center
+      // Center point references
       const cx = w / 2;
       const cy = h / 2;
       const dx = this.x - cx;
       const dy = this.y - cy;
       const dist = Math.sqrt(dx * dx + dy * dy) || 1;
 
-      // Combination of sink (pulling inward) and rotation
-      const driftX = (-dx / dist) * 1.5 - (dy / dist) * 2.0;
-      const driftY = (-dy / dist) * 1.5 + (dx / dist) * 2.0;
+      // Dynamic Time-Varying Vector Field Components
+      // The landscape shifts periodically using sine/cosine waves
+      const waveInput = time * 0.02;
+      const vortexStrength = 2.5 + Math.sin(waveInput) * 1.5;
+      const sinkStrength = 0.5 + Math.cos(waveInput * 1.5) * 1.5;
+      const waveDistortion = Math.sin(this.y * 0.03 + waveInput) * 1.2;
 
-      // 2. Stochastic Diffusion Term (Brownian Motion approximation via Box-Muller)
+      // Combined non-autonomous drift components b(X_t, t)
+      const driftX = (-dx / dist) * sinkStrength - (dy / dist) * vortexStrength + waveDistortion;
+      const driftY = (-dy / dist) * sinkStrength + (dx / dist) * vortexStrength;
+
+      // Stochastic Diffusion Step (Box-Muller Transform for Gaussian noise)
       const u1 = Math.random() || 0.0001;
       const u2 = Math.random() || 0.0001;
       const nX = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
       const nY = Math.sqrt(-2.0 * Math.log(u1)) * Math.sin(2.0 * Math.PI * u2);
 
-      // SDE Update integration step
-      this.x += driftX * dt + sigma * nX * Math.sqrt(dt);
-      this.y += driftY * dt + sigma * nY * Math.sqrt(dt);
+      // SDE integration step
+      const stepX = driftX * dt + sigma * nX * Math.sqrt(dt);
+      const stepY = driftY * dt + sigma * nY * Math.sqrt(dt);
 
-      // Boundary handling
+      this.x += stepX;
+      this.y += stepY;
+
+      // Track instantaneous velocity magnitude for dynamic styling
+      this.velocityMagnitude = Math.sqrt(stepX * stepX + stepY * stepY);
+
       if (this.x < 0 || this.x > w || this.y < 0 || this.y > h) {
         this.reset(w, h);
       }
@@ -83,23 +92,31 @@
     draw(themeColor) {
       if (this.history.length < 2) return;
       
-      // Draw path fading out over time
+      // Scale line thickness dynamically based on speed
+      const baseLineWidth = Math.min(2.5, 0.5 + this.velocityMagnitude * 0.3);
+      
       for (let i = 1; i < this.history.length; i++) {
         const p1 = this.history[i - 1];
         const p2 = this.history[i];
-        const alpha = (i / this.history.length) * (1 - this.age / this.maxAge);
+        
+        // Fading opacity profile along the tail duration
+        const lifeRatio = 1 - this.age / this.maxAge;
+        const tailRatio = i / this.history.length;
+        const alpha = tailRatio * lifeRatio * 0.85;
         
         ctx.beginPath();
         ctx.moveTo(p1.x, p1.y);
         ctx.lineTo(p2.x, p2.y);
+        
         ctx.strokeStyle = themeColor.replace(')', `, ${alpha})`).replace('rgb', 'rgba');
-        ctx.lineWidth = 1.5;
+        ctx.lineWidth = baseLineWidth * (i / this.history.length);
+        ctx.lineCap = 'round';
         ctx.stroke();
       }
     }
   }
 
-  // Set up particles
+  // Initialization
   const rect = canvas.parentElement.getBoundingClientRect();
   for (let i = 0; i < particleCount; i++) {
     particles.push(new Particle(rect.width, rect.height));
@@ -109,17 +126,22 @@
   window.addEventListener('resize', resize);
 
   function animate() {
+    globalTime++;
     const currentW = canvas.width / window.devicePixelRatio;
     const currentH = canvas.height / window.devicePixelRatio;
 
+    // Use a very faint overlay fill instead of full clear to introduce temporary frame persistence
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--global-bg-color').trim() === '#1c1c1c' 
+      ? 'rgba(28, 28, 28, 0.08)' 
+      : 'rgba(255, 255, 255, 0.08)';
+    
+    // Fallback clear to keep canvas performing crisply
     ctx.clearRect(0, 0, currentW, currentH);
 
-    // Dynamic color fetching from al-folio CSS theme variables
-    const computedStyle = getComputedStyle(document.documentElement);
-    const themeColor = computedStyle.getPropertyValue('--global-theme-color').trim() || 'rgba(0, 123, 255, 1)';
+    const themeColor = getComputedStyle(document.documentElement).getPropertyValue('--global-theme-color').trim() || 'rgba(0, 123, 255, 1)';
 
     particles.forEach(p => {
-      p.update(currentW, currentH);
+      p.update(currentW, currentH, globalTime);
       p.draw(themeColor);
     });
 
