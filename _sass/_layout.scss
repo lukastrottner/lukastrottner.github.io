@@ -86,9 +86,9 @@ body.sticky-bottom-footer {
         abbr {
           display: inline-block;
           background-color: var(--global-theme-color);
+          color: var(--global-bg-color) !important;
           padding-left: 1rem;
-          padding-right: 1rem;
-          color: var(--global-bg-color); 
+          padding-right: 1rem; 
         /*   a {
             color: var(--global-bg-color);
             &:hover {
