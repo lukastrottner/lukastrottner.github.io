@@ -22,3 +22,5 @@ Before coming to Stuttgart, I was an Assistant Professor in Statistics at the [U
 <b>Research interests:</b> Generative models, statistics for stochastic processes, transfer learning, data-driven stochastic optimal control, high-dimensional statistical inference, Lévy processes and Markov additive processes.
 
 If you are interested in doing a PhD with me, please get in touch via email.
+
+{% include stochastic_flow.html %}
