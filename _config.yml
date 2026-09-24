@@ -324,7 +324,10 @@ scholar:
   order: descending
   #type_aliases: { inproceedings: incollection}
   type_order: [article, inproceedings, misc]
-  type_names: {misc: preprints, article: journal articles, inproceedings: proceedings}
+  type_names: {misc: preprints, article: journal articles, inproceedings: conference papers}
+
+  localization:
+    in: ""
   
   bibtex_filters: [latex, smallcaps, superscript]
 
