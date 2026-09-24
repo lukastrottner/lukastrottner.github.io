@@ -8,11 +8,11 @@
   const ctx = canvas.getContext('2d');
   let animationFrameId;
 
-  // Multi-dimensional Process Configuration
-  const processCount = 4;        // Number of independent multivariate path lines
-  const maxHistory = 140;        // Path history memory capacity before deletion
-  const stepsPerFrame = 4;       // Sub-frame integration steps for crisp high-speed spikes
-  const sigma = 3.8;             // Diffusion scaling factor (volatility magnitude)
+  // Heightened Multivariate Configuration
+  const processCount = 12;       // Increased from 4 to 12 for dense, concurrent paths
+  const maxHistory = 90;         // Slightly shorter memory for crisp path evaporation
+  const stepsPerFrame = 4;       // Maintains fast, sharp sub-frame jumps
+  const sigma = 3.6;             // Volatility scaling parameter
   
   let processes = [];
 
@@ -28,15 +28,15 @@
     processes = [];
     for (let i = 0; i < processCount; i++) {
       processes.push({
-        // Start randomly in the interior domain space
-        x: w * 0.25 + Math.random() * w * 0.5,
-        y: h * 0.25 + Math.random() * h * 0.5,
-        history: [] // Finite historical trajectory array
+        x: w * 0.15 + Math.random() * w * 0.7,
+        y: h * 0.15 + Math.random() * h * 0.7,
+        history: [],
+        // Randomize historical memory lengths slightly per path to add organic variation
+        localMaxHistory: maxHistory + Math.floor(Math.random() * 30)
       });
     }
   }
 
-  // Box-Muller sample generator for true standard normal Gaussian increments
   function getGaussianPair() {
     const u1 = Math.random() || 0.0001;
     const u2 = Math.random() || 0.0001;
@@ -48,51 +48,47 @@
   function updateAndDraw(w, h, themeColor) {
     processes.forEach((p, idx) => {
       
-      // Perform sub-sampling steps per frame to create high-velocity spiky rendering paths
       for (let s = 0; s < stepsPerFrame; s++) {
         const noise = getGaussianPair();
         
-        // Dynamic path tracking state
         p.history.push({ x: p.x, y: p.y });
         
-        // Strict boundary history clearing
-        if (p.history.length > maxHistory) {
+        if (p.history.length > p.localMaxHistory) {
           p.history.shift();
         }
 
-        // Wiener Process increment updates: dX_t = sigma * dW_t
+        // Stochastic increment step
         p.x += sigma * noise.z0;
         p.y += sigma * noise.z1;
 
-        // --- Skorokhod Boundary Reflection Logic ---
-        // Instantly reflects coordinates back into the interior if a boundary barrier layout is pierced
-        if (p.x < 0)   { p.x = -p.x; }
-        if (p.x > w)   { p.x = 2 * w - p.x; }
-        if (p.y < 0)   { p.y = -p.y; }
-        if (p.y > h)   { p.y = 2 * h - p.y; }
+        // Skorokhod boundary reflection controls
+        if (p.x < 0) { p.x = -p.x; }
+        if (p.x > w) { p.x = 2 * w - p.x; }
+        if (p.y < 0) { p.y = -p.y; }
+        if (p.y > h) { p.y = 2 * h - p.y; }
       }
 
-      // Draw the complete active multivariate trajectory memory block
       if (p.history.length < 2) return;
 
+      // Draw the crisp historical trace line
       ctx.beginPath();
       ctx.moveTo(p.history[0].x, p.history[0].y);
       for (let i = 1; i < p.history.length; i++) {
         ctx.lineTo(p.history[i].x, p.history[i].y);
       }
 
-      // Individual path alpha weighting profile based on index mapping variations
-      const alphaBase = 0.12 + (idx * 0.04);
+      // Layered alpha opacity to balance 12 active streams perfectly
+      const alphaBase = 0.06 + ((idx % 4) * 0.03); 
       ctx.strokeStyle = themeColor.replace(')', `, ${alphaBase})`).replace('rgb', 'rgba');
-      ctx.lineWidth = 1.2;
+      ctx.lineWidth = 1.0;
       ctx.lineCap = 'round';
-      ctx.lineJoin = 'miter'; // Miter gives razor-sharp spiky joints instead of rounded edges
+      ctx.lineJoin = 'miter'; 
       ctx.stroke();
 
-      // Draw a solid tracking cursor node right at the current process location head index
+      // Render the current path's head index coordinate dot
       ctx.beginPath();
-      ctx.arc(p.x, p.y, 2, 0, 2 * Math.PI);
-      ctx.fillStyle = themeColor.replace(')', `, ${alphaBase * 2.0})`).replace('rgb', 'rgba');
+      ctx.arc(p.x, p.y, 1.8, 0, 2 * Math.PI);
+      ctx.fillStyle = themeColor.replace(')', `, ${alphaBase * 2.5})`).replace('rgb', 'rgba');
       ctx.fill();
     });
   }
