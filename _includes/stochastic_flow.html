@@ -9,8 +9,7 @@
   let animationFrameId;
   let globalTime = 0;
 
-  // Configuration for continuous flow lines instead of tiny particles
-  const lineCount = 14; 
+  const lineCount = 10; 
   let streamlines = [];
 
   function resize() {
@@ -23,54 +22,55 @@
 
   function initLines(w, h) {
     streamlines = [];
-    // Distribute baseline heights evenly across the container height
     for (let i = 0; i < lineCount; i++) {
       streamlines.push({
         baseY: (h / (lineCount + 1)) * (i + 1),
-        seed: Math.random() * 100
+        seed: Math.random() * 500
       });
     }
   }
 
+  // Pure deterministic pseudo-noise function to generate sharp, reproducible spikes
+  function spikeNoise(x) {
+    return Math.abs(Math.sin(x) * Math.cos(x * 2.5)) - 0.5;
+  }
+
   function drawFlowField(w, h, time, themeColor) {
-    // Spatial configuration
-    const resolution = 6; // Horizontal resolution step in pixels
-    const slowTime = time * 0.004; // Very slow temporal drift
+    const resolution = 2; // Drastically lowered to 2px for razor-sharp, spiky details
+    const fastTime = time * 0.02; // Accelerated timeline for higher energy jitter
 
     streamlines.forEach((line, index) => {
       ctx.beginPath();
       
-      // Calculate smooth alpha gradient based on proximity to center vertical stack
       const normalizedRank = index / lineCount;
-      const verticalFade = Math.sin(normalizedRank * Math.PI); // Fades out at top/bottom bounds
-      const alpha = 0.06 + verticalFade * 0.16; 
+      const verticalFade = Math.sin(normalizedRank * Math.PI);
+      const alpha = 0.05 + verticalFade * 0.18; 
 
       ctx.strokeStyle = themeColor.replace(')', `, ${alpha})`).replace('rgb', 'rgba');
-      ctx.lineWidth = 1.5 + (verticalFade * 1.0); // Slightly thicker lines in the middle
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
+      ctx.lineWidth = 1.2;
 
       let first = true;
 
       for (let x = 0; x <= w; x += resolution) {
-        // Multi-frequency harmonic wave simulating a continuous smooth random process
-        const freq1 = 0.0035;
-        const freq2 = 0.009;
-        const freq3 = 0.022;
+        // Multi-frequency Fractal-like Synthesis (Combining macro waves with micro spikes)
+        const input1 = x * 0.003 + fastTime * 0.1 + line.seed;
+        const input2 = x * 0.015 - fastTime * 0.3 + line.seed * 1.5;
+        const input3 = x * 0.06 + fastTime * 0.8 + line.seed * 3.0; // High frequency micro-spike layer
 
-        // Long background drift wave
-        const wave1 = Math.sin(x * freq1 + slowTime + line.seed) * (h * 0.22);
-        // Intersecting secondary wave structure
-        const wave2 = Math.cos(x * freq2 - slowTime * 1.4 + line.seed * 2) * (h * 0.08);
-        // Micro-topography ripple representing smooth structural diffusion
-        const wave3 = Math.sin(x * freq3 + slowTime * 2.5 + line.seed * 3) * 6;
+        // 1. Macro trend layout
+        const macro = Math.sin(input1) * (h * 0.2);
+        
+        // 2. Intermediate chaotic jagged layer
+        const jagged = spikeNoise(input2) * (h * 0.09);
+        
+        // 3. Pure spiky fractal noise (high-frequency roughness)
+        const microSpikes = (Math.sin(input3) * Math.cos(input3 * 1.7)) * 14;
 
-        // Composite localized spatial amplitude mapping
-        const totalDisplacement = wave1 + wave2 + wave3;
-        const currentY = line.baseY + totalDisplacement;
+        // Composite amplitude structure
+        const totalDisplacement = macro + jagged + microSpikes;
 
-        // Apply smooth horizontal padding fade to avoid harsh clips at canvas edges
-        const edgePadding = 60;
+        // Boundaries padding fade structure
+        const edgePadding = 40;
         let edgeFade = 1;
         if (x < edgePadding) edgeFade = x / edgePadding;
         if (x > w - edgePadding) edgeFade = (w - x) / edgePadding;
@@ -88,7 +88,6 @@
     });
   }
 
-  // Hook resize triggers
   resize();
   window.addEventListener('resize', resize);
 
