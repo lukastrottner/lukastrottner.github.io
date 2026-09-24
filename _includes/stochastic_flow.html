@@ -1,4 +1,4 @@
-<div class="stochastic-flow-container" style="position: relative; width: 100%; height: 320px; background: transparent; border: 1px solid var(--global-divider-color); border-radius: 6px; overflow: hidden; margin: 20px 0;">
+<div class="stochastic-flow-container" style="position: relative; width: 100%; height: 280px; background: transparent; border: 1px solid var(--global-divider-color); border-radius: 6px; overflow: hidden; margin: 20px 0;">
   <canvas id="flowCanvas" style="display: block; width: 100%; height: 100%;"></canvas>
 </div>
 
@@ -7,89 +7,88 @@
   const canvas = document.getElementById('flowCanvas');
   const ctx = canvas.getContext('2d');
   let animationFrameId;
-
-  // Structural Grid Settings (No free-floating tails)
-  const gridSpacing = 24; 
-  const nodes = [];
-  const sigma = 1.4; // Jitter magnitude for the stochastic component
   let globalTime = 0;
+
+  // Configuration for continuous flow lines instead of tiny particles
+  const lineCount = 14; 
+  let streamlines = [];
 
   function resize() {
     const rect = canvas.parentElement.getBoundingClientRect();
     canvas.width = rect.width * window.devicePixelRatio;
     canvas.height = rect.height * window.devicePixelRatio;
     ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-    initGrid(rect.width, rect.height);
+    initLines(rect.width, rect.height);
   }
 
-  function initGrid(w, h) {
-    nodes.length = 0;
-    const cols = Math.floor(w / gridSpacing) + 1;
-    const rows = Math.floor(h / gridSpacing) + 1;
-    
-    for (let c = 0; c < cols; c++) {
-      for (let r = 0; r < rows; r++) {
-        nodes.push({
-          baseX: c * gridSpacing + (gridSpacing / 2),
-          baseY: r * gridSpacing + (gridSpacing / 2),
-          currentX: c * gridSpacing + (gridSpacing / 2),
-          currentY: r * gridSpacing + (gridSpacing / 2)
-        });
-      }
+  function initLines(w, h) {
+    streamlines = [];
+    // Distribute baseline heights evenly across the container height
+    for (let i = 0; i < lineCount; i++) {
+      streamlines.push({
+        baseY: (h / (lineCount + 1)) * (i + 1),
+        seed: Math.random() * 100
+      });
     }
   }
 
-  function drawVectorField(w, h, time, themeColor) {
-    const cx = w / 2;
-    const cy = h / 2;
-    const waveInput = time * 0.015;
+  function drawFlowField(w, h, time, themeColor) {
+    // Spatial configuration
+    const resolution = 6; // Horizontal resolution step in pixels
+    const slowTime = time * 0.004; // Very slow temporal drift
 
-    nodes.forEach(node => {
-      const dx = node.baseX - cx;
-      const dy = node.baseY - cy;
-      const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-
-      // 1. Structural Deterministic Vector Matrix Field
-      // A clean mathematical saddle/vortex transformation that changes over time
-      const angle = Math.atan2(dy, dx);
-      const force = Math.sin(dist * 0.01 - waveInput) * 8;
-      
-      const targetX = node.baseX + Math.cos(angle + Math.PI / 2) * force;
-      const targetY = node.baseY + Math.sin(angle + Math.PI / 2) * force;
-
-      // 2. Pure Gaussian Stochastic Noise Integration
-      const u1 = Math.random() || 0.0001;
-      const u2 = Math.random() || 0.0001;
-      const nX = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
-      const nY = Math.sqrt(-2.0 * Math.log(u1)) * Math.sin(2.0 * Math.PI * u2);
-
-      // Relax current coordinates toward the field target + add pure mathematical noise
-      node.currentX += (targetX - node.currentX) * 0.1 + nX * sigma;
-      node.currentY += (targetY - node.currentY) * 0.1 + nY * sigma;
-
-      // Draw structural elements (Lines and Crosses instead of trails)
+    streamlines.forEach((line, index) => {
       ctx.beginPath();
-      ctx.moveTo(node.baseX, node.baseY);
-      ctx.lineTo(node.currentX, node.currentY);
       
-      // Opacity fades smoothly near the outer boundaries of the canvas element
-      const edgeAlpha = Math.min(1, node.baseX / 40, (w - node.baseX) / 40, node.baseY / 40, (h - node.baseY) / 40);
-      const finalAlpha = Math.max(0, 0.25 * edgeAlpha);
-      
-      ctx.strokeStyle = themeColor.replace(')', `, ${finalAlpha})`).replace('rgb', 'rgba');
-      ctx.lineWidth = 1.0;
+      // Calculate smooth alpha gradient based on proximity to center vertical stack
+      const normalizedRank = index / lineCount;
+      const verticalFade = Math.sin(normalizedRank * Math.PI); // Fades out at top/bottom bounds
+      const alpha = 0.06 + verticalFade * 0.16; 
+
+      ctx.strokeStyle = themeColor.replace(')', `, ${alpha})`).replace('rgb', 'rgba');
+      ctx.lineWidth = 1.5 + (verticalFade * 1.0); // Slightly thicker lines in the middle
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      let first = true;
+
+      for (let x = 0; x <= w; x += resolution) {
+        // Multi-frequency harmonic wave simulating a continuous smooth random process
+        const freq1 = 0.0035;
+        const freq2 = 0.009;
+        const freq3 = 0.022;
+
+        // Long background drift wave
+        const wave1 = Math.sin(x * freq1 + slowTime + line.seed) * (h * 0.22);
+        // Intersecting secondary wave structure
+        const wave2 = Math.cos(x * freq2 - slowTime * 1.4 + line.seed * 2) * (h * 0.08);
+        // Micro-topography ripple representing smooth structural diffusion
+        const wave3 = Math.sin(x * freq3 + slowTime * 2.5 + line.seed * 3) * 6;
+
+        // Composite localized spatial amplitude mapping
+        const totalDisplacement = wave1 + wave2 + wave3;
+        const currentY = line.baseY + totalDisplacement;
+
+        // Apply smooth horizontal padding fade to avoid harsh clips at canvas edges
+        const edgePadding = 60;
+        let edgeFade = 1;
+        if (x < edgePadding) edgeFade = x / edgePadding;
+        if (x > w - edgePadding) edgeFade = (w - x) / edgePadding;
+        
+        const finalY = line.baseY + (totalDisplacement * edgeFade);
+
+        if (first) {
+          ctx.moveTo(x, finalY);
+          first = false;
+        } else {
+          ctx.lineTo(x, finalY);
+        }
+      }
       ctx.stroke();
-
-      // Render a clean coordinate dot at the displaced node index
-      ctx.beginPath();
-      ctx.arc(node.currentX, node.currentY, 1.2, 0, 2 * Math.PI);
-      ctx.fillStyle = themeColor.replace(')', `, ${finalAlpha * 1.5})`).replace('rgb', 'rgba');
-      ctx.fill();
     });
   }
 
-  // Initial trigger setup
-  const rect = canvas.parentElement.getBoundingClientRect();
+  // Hook resize triggers
   resize();
   window.addEventListener('resize', resize);
 
@@ -102,7 +101,7 @@
 
     const themeColor = getComputedStyle(document.documentElement).getPropertyValue('--global-theme-color').trim() || 'rgba(0, 123, 255, 1)';
 
-    drawVectorField(currentW, currentH, globalTime, themeColor);
+    drawFlowField(currentW, currentH, globalTime, themeColor);
 
     animationFrameId = requestAnimationFrame(animate);
   }
