@@ -15,7 +15,7 @@ selected_papers: false # includes a list of papers marked as "selected={true}"
 social: false # includes social icons at the bottom of the page
 ---
 
-I am an Assistant Professor and chair of Mathematical Statistics at the [Institute for Stochastics and Applications at University of Stuttgart](https://www.isa.uni-stuttgart.de/en/).
+I am an Assistant Professor and head of the Mathematical Statistics group at the [Institute for Stochastics and Applications at University of Stuttgart](https://www.isa.uni-stuttgart.de/en/).
 
 Before coming to Stuttgart, I was an Assistant Professor in Statistics at the [University of Birmingham](https://www.birmingham.ac.uk/schools/mathematics) from September 2024 -- October 2025. Prior to this, I did a postdoc at [Aarhus University](https://math.au.dk/en/) from September 2021 -- September 2024 working in the research group of [Prof. Claudia Strauch](https://ssp.math.uni-heidelberg.de). I obtained my PhD in Mathematics at the [University of Mannheim](https://www.wim.uni-mannheim.de/en/) in September 2021 under the supervision of [Prof. Leif Döring](https://www.wim.uni-mannheim.de/doering/).
 
