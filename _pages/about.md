@@ -23,4 +23,8 @@ Before coming to Stuttgart, I was an Assistant Professor in Statistics at the [U
 
 If you are interested in doing a PhD with me, please get in touch via email.
 
-{% include stochastic_flow.html %}
+<div class="row m-0 p-0">
+  <div class="col-12 col-sm-8 p-0">
+    {% include stochastic_flow.html %}
+  </div>
+</div>
