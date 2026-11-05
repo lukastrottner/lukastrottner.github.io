@@ -19,7 +19,7 @@ I am a Junior Professor and head of the Mathematical Statistics group at the [In
 
 Before coming to Stuttgart, I was an Assistant Professor in Statistics at the [University of Birmingham](https://www.birmingham.ac.uk/schools/mathematics) from September 2024 -- October 2025. Prior to this, I did a postdoc at [Aarhus University](https://math.au.dk/en/) from September 2021 -- September 2024 working in the research group of [Prof. Claudia Strauch](https://ssp.math.uni-heidelberg.de). I obtained my PhD in Mathematics at the [University of Mannheim](https://www.wim.uni-mannheim.de/en/) in September 2021 under the supervision of [Prof. Leif Döring](https://www.wim.uni-mannheim.de/doering/).
 
-<b>Research interests:</b> Statistical foundations of machine learning, generative models, statistics for stochastic processes, transfer learning, data-driven stochastic optimal control, Lévy processes and Markov additive processes.
+<b>Research interests:</b> Statistical foundations of machine learning, generative models, statistics for stochastic processes, data-driven stochastic optimal control, Lévy processes and Markov additive processes.
 
 If you are interested in doing a PhD with me, please get in touch via email.
 
